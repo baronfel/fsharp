@@ -525,10 +525,10 @@
       <Link>Symbols/SymbolPatterns.fs</Link>
     </Compile>
     <Compile Include="$(FSharpSourcesRoot)\fsharp\service\IncrementalBuild.fsi">
-      <Link>Service/IncrementalBuild.fsi</Link>
+      <Link>service/IncrementalBuild.fsi</Link>
     </Compile>
     <Compile Include="$(FSharpSourcesRoot)\fsharp\service\IncrementalBuild.fs">
-      <Link>Service/IncrementalBuild.fs</Link>
+      <Link>service/IncrementalBuild.fs</Link>
     </Compile>
     <Compile Include="$(FSharpSourcesRoot)\fsharp\service\Reactor.fsi">
       <Link>Service/Reactor.fsi</Link>

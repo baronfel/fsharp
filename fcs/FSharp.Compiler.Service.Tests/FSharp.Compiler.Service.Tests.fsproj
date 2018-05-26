@@ -5,7 +5,7 @@
   <Import Project="..\fcs.props" />
   <Import Project="..\netfx.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);44;75;</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -61,6 +61,9 @@
     </Compile>
     <Compile Include="$(FSharpSourcesRoot)\..\tests\service\TokenizerTests.fs">
       <Link>TokenizerTests.fs</Link>
+    </Compile>
+    <Compile Include="$(FSharpSourcesRoot)\..\tests\service\TooltipTests.fs">
+      <Link>TooltipTests.fs</Link>
     </Compile>
     <Compile Include="$(FSharpSourcesRoot)\..\tests\service\Program.fs" Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
       <Link>Program.fs</Link>
