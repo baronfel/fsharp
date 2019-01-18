@@ -1472,7 +1472,7 @@ type CapturedNameResolution(p:pos, i:Item, tpinst, io:ItemOccurence, de:DisplayE
 type TcResolutions
     (capturedEnvs : ResizeArray<range * NameResolutionEnv * AccessorDomain>,
      capturedExprTypes : ResizeArray<pos * TType * DisplayEnv * NameResolutionEnv * AccessorDomain * range>,
-     capturedNameResolutions : ResizeArray<CapturedNameResolution>,
+     capturedNameResolutions : HeapAwareResizeArray<CapturedNameResolution>,
      capturedMethodGroupResolutions : ResizeArray<CapturedNameResolution>) = 
 
     static let empty = TcResolutions(ResizeArray(0),ResizeArray(0),ResizeArray(0),ResizeArray(0))
@@ -1496,12 +1496,12 @@ type TcSymbolUseData =
 /// This is a memory-critical data structure - allocations of this data structure and its immediate contents
 /// is one of the highest memory long-lived data structures in typical uses of IDEs. Not many of these objects
 /// are allocated (one per file), but they are large because the allUsesOfAllSymbols array is large.
-type TcSymbolUses(g, capturedNameResolutions : ResizeArray<CapturedNameResolution>, formatSpecifierLocations: (range * int)[]) =
+type TcSymbolUses(g, capturedNameResolutions : HeapAwareResizeArray<CapturedNameResolution>, formatSpecifierLocations: (range * int)[]) =
 
     // Make sure we only capture the information we really need to report symbol uses
     let allUsesOfSymbols =
         capturedNameResolutions
-        |> ResizeArray.mapToSmallArrayChunks (fun cnr -> { Item=cnr.Item; ItemOccurence=cnr.ItemOccurence; DisplayEnv=cnr.DisplayEnv; Range=cnr.Range })
+        |> HeapAwareResizeArray.map (fun cnr -> { Item=cnr.Item; ItemOccurence=cnr.ItemOccurence; DisplayEnv=cnr.DisplayEnv; Range=cnr.Range })
 
     let capturedNameResolutions = () 
     do ignore capturedNameResolutions // don't capture this!
@@ -1510,10 +1510,9 @@ type TcSymbolUses(g, capturedNameResolutions : ResizeArray<CapturedNameResolutio
         // This member returns what is potentially a very large array, which may approach the size constraints of the Large Object Heap.
         // This is unlikely in practice, though, because we filter down the set of all symbol uses to those specifically for the given `item`.
         // Consequently we have a much lesser chance of ending up with an array large enough to be promoted to the LOH.
-        [| for symbolUseChunk in allUsesOfSymbols do
-            for symbolUse in symbolUseChunk do
-                if protectAssemblyExploration false (fun () -> ItemsAreEffectivelyEqual g item symbolUse.Item) then
-                    yield symbolUse |]
+        [| for symbolUse in allUsesOfSymbols do
+            if protectAssemblyExploration false (fun () -> ItemsAreEffectivelyEqual g item symbolUse.Item) then
+                yield symbolUse |]
 
     member this.AllUsesOfSymbols = allUsesOfSymbols
 
@@ -1523,7 +1522,7 @@ type TcSymbolUses(g, capturedNameResolutions : ResizeArray<CapturedNameResolutio
 type TcResultsSinkImpl(g, ?source: string) =
     let capturedEnvs = ResizeArray<_>()
     let capturedExprTypings = ResizeArray<_>()
-    let capturedNameResolutions = ResizeArray<_>()
+    let capturedNameResolutions = HeapAwareResizeArray.HeapAwareAddOnlyResizeArray<_>()
     let capturedFormatSpecifierLocations = ResizeArray<_>()
     
     let capturedNameResolutionIdentifiers = 

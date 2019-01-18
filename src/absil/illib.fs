@@ -5,6 +5,7 @@ module public Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 
 
 open System
+open System.Collections
 open System.Collections.Generic
 open System.Diagnostics
 open System.IO
@@ -478,6 +479,53 @@ module ResizeArray =
         /// in order to prevent long-term storage of those values
         chunkBySize maxArrayItemCount f inp
 
+/// A type that spans effectively limitless memory while keeping each individual chunk away from the LOH threshold size.
+/// This type is not threadsafe in any way, so callers must ensure single-threaded access to all members
+type HeapAwareResizeArray<'T> () =
+    let heapsize = 84_900 // deliberately off from the actual heapsize of 85000 bytes
+    let elementsPerArray = heapsize / sizeof<'T>
+
+    let newChild () = ResizeArray<_>(elementsPerArray)
+    let innerArrays =
+        // initialize here so that the counting logic in Add isn't off
+        let holder = ResizeArray<ResizeArray<'T>>()
+        holder.Add(newChild())
+        holder
+
+    let mutable length = 0
+
+    member x.Length = length
+
+    member x.Add item =
+        let arrayToInsert =
+            innerArrays
+            |> Seq.tryFind (fun arr -> arr.Count < arr.Capacity)
+            |> Option.defaultWith (fun () ->
+                let arr = newChild()
+                innerArrays.Add arr
+                arr
+            )
+        arrayToInsert.Add item
+        length <- length + 1
+
+    interface IEnumerable with
+        member x.GetEnumerator() = (x :> IEnumerable<'T>).GetEnumerator() :> _
+
+    interface IEnumerable<'T> with
+        member x.GetEnumerator() : IEnumerator<'T> =
+             (seq {
+                 for innerArray in innerArrays do
+                    for item in innerArray do
+                        yield item
+             }).GetEnumerator()
+
+module HeapAwareResizeArray =
+
+    let map f arr =
+        let arr' = new HeapAwareResizeArray<_>()
+        for item in arr do
+            arr'.Add(f item)
+        arr'
 
 /// Because FSharp.Compiler.Service is a library that will target FSharp.Core 4.5.2 for the forseeable future,
 /// we need to stick these functions in this module rather than using the module functions for ValueOption
