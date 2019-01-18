@@ -295,10 +295,10 @@ type internal TcResolutions =
     member CapturedExpressionTypings : ResizeArray<pos * TType * DisplayEnv * NameResolutionEnv * AccessorDomain * range>
 
     /// Exact name resolutions
-    member CapturedNameResolutions : ResizeArray<CapturedNameResolution>
+    member CapturedNameResolutions : HeapAwareResizeArray<CapturedNameResolution>
 
     /// Represents all the resolutions of names to groups of methods.
-    member CapturedMethodGroupResolutions : ResizeArray<CapturedNameResolution>
+    member CapturedMethodGroupResolutions : HeapAwareResizeArray<CapturedNameResolution>
 
     /// Represents the empty set of resolutions 
     static member Empty : TcResolutions
@@ -319,7 +319,7 @@ type internal TcSymbolUses =
     member GetUsesOfSymbol : Item -> TcSymbolUseData[]
 
     /// All the uses of all items within the file
-    member AllUsesOfSymbols : TcSymbolUseData[][]
+    member AllUsesOfSymbols : HeapAwareResizeArray<TcSymbolUseData>
 
     /// Get the locations of all the printf format specifiers in the file
     member GetFormatSpecifierLocationsAndArity : unit -> (range * int)[]

@@ -1473,9 +1473,9 @@ type TcResolutions
     (capturedEnvs : ResizeArray<range * NameResolutionEnv * AccessorDomain>,
      capturedExprTypes : ResizeArray<pos * TType * DisplayEnv * NameResolutionEnv * AccessorDomain * range>,
      capturedNameResolutions : HeapAwareResizeArray<CapturedNameResolution>,
-     capturedMethodGroupResolutions : ResizeArray<CapturedNameResolution>) = 
+     capturedMethodGroupResolutions : HeapAwareResizeArray<CapturedNameResolution>) = 
 
-    static let empty = TcResolutions(ResizeArray(0),ResizeArray(0),ResizeArray(0),ResizeArray(0))
+    static let empty = TcResolutions(ResizeArray(0),ResizeArray(0),HeapAwareResizeArray(),HeapAwareResizeArray())
     
     member this.CapturedEnvs = capturedEnvs
     member this.CapturedExpressionTypings = capturedExprTypes
@@ -1522,7 +1522,7 @@ type TcSymbolUses(g, capturedNameResolutions : HeapAwareResizeArray<CapturedName
 type TcResultsSinkImpl(g, ?source: string) =
     let capturedEnvs = ResizeArray<_>()
     let capturedExprTypings = ResizeArray<_>()
-    let capturedNameResolutions = HeapAwareResizeArray.HeapAwareAddOnlyResizeArray<_>()
+    let capturedNameResolutions = HeapAwareResizeArray<_>()
     let capturedFormatSpecifierLocations = ResizeArray<_>()
     
     let capturedNameResolutionIdentifiers = 
@@ -1537,7 +1537,7 @@ type TcResultsSinkImpl(g, ?source: string) =
                     member __.GetHashCode ((m, _)) = hash m
                     member __.Equals ((m1, item1), (m2, item2)) = m1 = m2 && ItemsAreEffectivelyEqual g item1 item2 } )
 
-    let capturedMethodGroupResolutions = ResizeArray<_>()
+    let capturedMethodGroupResolutions = HeapAwareResizeArray<_>()
     let capturedOpenDeclarations = ResizeArray<OpenDeclaration>()
     let allowedRange (m:range) = not m.IsSynthetic       
 

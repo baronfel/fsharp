@@ -272,7 +272,7 @@ type TypeCheckInfo
             | ResolveOverloads.Yes -> sResolutions.CapturedNameResolutions 
             | ResolveOverloads.No -> sResolutions.CapturedMethodGroupResolutions
 
-        let quals = quals |> ResizeArray.filter (fun cnr ->  posEq cnr.Pos endOfNamesPos)
+        let quals = quals |> HeapAwareResizeArray.filter (fun cnr ->  posEq cnr.Pos endOfNamesPos)
         
         quals
 
@@ -283,7 +283,7 @@ type TypeCheckInfo
         let endOfNamesPos = mkPos line colAtEndOfNames
 
         // Logic below expects the list to be in reverse order of resolution
-        let cnrs = GetCapturedNameResolutions endOfNamesPos resolveOverloads |> ResizeArray.toList |> List.rev
+        let cnrs = GetCapturedNameResolutions endOfNamesPos resolveOverloads |> HeapAwareResizeArray.toList |> List.rev
 
         match cnrs, membersByResidue with 
         
@@ -340,7 +340,7 @@ type TypeCheckInfo
     
     let TryGetTypeFromNameResolution(line, colAtEndOfNames, membersByResidue, resolveOverloads) = 
         let endOfNamesPos = mkPos line colAtEndOfNames
-        let items = GetCapturedNameResolutions endOfNamesPos resolveOverloads |> ResizeArray.toList |> List.rev
+        let items = GetCapturedNameResolutions endOfNamesPos resolveOverloads |> HeapAwareResizeArray.toList |> List.rev
         
         match items, membersByResidue with 
         | CNR(_,Item.Types(_,(ty::_)),_,_,_,_,_)::_, Some _ -> Some ty
@@ -362,7 +362,7 @@ type TypeCheckInfo
         )
 
     let GetNamedParametersAndSettableFields endOfExprPos hasTextChangedSinceLastTypecheck =
-        let cnrs = GetCapturedNameResolutions endOfExprPos ResolveOverloads.No |> ResizeArray.toList |> List.rev
+        let cnrs = GetCapturedNameResolutions endOfExprPos ResolveOverloads.No |> HeapAwareResizeArray.toList |> List.rev
         let result =
             match cnrs with
             | CNR(_, Item.CtorGroup(_, ((ctor::_) as ctors)), _, denv, nenv, ad, m) ::_ ->

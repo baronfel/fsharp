@@ -497,16 +497,32 @@ type HeapAwareResizeArray<'T> () =
     member x.Length = length
 
     member x.Add item =
-        let arrayToInsert =
-            innerArrays
-            |> Seq.tryFind (fun arr -> arr.Count < arr.Capacity)
-            |> Option.defaultWith (fun () ->
-                let arr = newChild()
-                innerArrays.Add arr
-                arr
-            )
+        let arrayToInsert = 
+            let last = innerArrays.[innerArrays.Count - 1]
+            if last.Count = elementsPerArray 
+            then
+                let newLast = newChild ()
+                innerArrays.Add newLast
+                newLast
+            else last
         arrayToInsert.Add item
         length <- length + 1
+
+    //TODO: we have to do compaction as part of this, because logic elsewhere expects 'add's to be in sequence
+    member x.RemoveAll pred =
+        let mutable removed = 0
+        let mutable arrayIndex = -1
+        let mutable lastPartialArray = -1
+        for child in innerArrays do
+            let removedThisArray = child.RemoveAll pred
+            arrayIndex <- arrayIndex + 1
+            if removedThisArray <> 0 then
+                removed <- removed + removedThisArray
+                let partialArr = innerArrays.[lastPartialArray]
+                let partialRemaining = partialArr.Capacity - partialArr.Count
+                () 
+        length <- length - removed
+        removed
 
     interface IEnumerable with
         member x.GetEnumerator() = (x :> IEnumerable<'T>).GetEnumerator() :> _
@@ -522,10 +538,19 @@ type HeapAwareResizeArray<'T> () =
 module HeapAwareResizeArray =
 
     let map f arr =
-        let arr' = new HeapAwareResizeArray<_>()
+        let arr' = HeapAwareResizeArray<_>()
         for item in arr do
             arr'.Add(f item)
         arr'
+    
+    let filter f arr = 
+        let arr' = HeapAwareResizeArray<_>()
+        for item in arr do
+            if f item then arr'.Add item
+        arr'
+    
+    let toList (arr: HeapAwareResizeArray<_>) = 
+        Seq.toList arr
 
 /// Because FSharp.Compiler.Service is a library that will target FSharp.Core 4.5.2 for the forseeable future,
 /// we need to stick these functions in this module rather than using the module functions for ValueOption
