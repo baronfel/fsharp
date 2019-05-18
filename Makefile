@@ -4,7 +4,7 @@ ConfigurationProperty = /p:Configuration=$(Configuration)
 Verbosity ?= normal
 VerbosityProperty = /Verbosity:$(Verbosity)
 
-MSBuild = /Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild
+MSBuild = $(shell which msbuild)
 RestoreCommand = $(MSBuild) /t:Restore
 BuildCommand = $(MSBuild) /t:Build
 TestCommand = $(MSBuild) /t:VSTest
@@ -17,7 +17,7 @@ NS20 = /p:TargetFramework=netstandard2.0
 NCA20 = /p:TargetFramework=netcoreapp2.0
 NCA21 = /p:TargetFramework=netcoreapp2.1
 
-all: proto restore build test
+all: proto restore build
 
 proto:
 	$(RestoreCommand) $(NF472) src/buildtools/buildtools.proj 
@@ -47,6 +47,8 @@ build: proto restore
 	$(BuildCommand) $(ConfigurationProperty) $(NF472) tests/FSharp.Core.UnitTests/FSharp.Core.UnitTests.fsproj
 	$(BuildCommand) $(ConfigurationProperty) $(NF472) tests/FSharp.Build.UnitTests/FSharp.Build.UnitTests.fsproj
 
+# note: can only run the VsTest target on dotnet sdk preview 3 or better, so right now this won't work on mono 5.20.
+# todo: replace with nunit invocation directly for mono builds?
 test: build
 	$(TestCommand) $(NF472) $(ConfigurationProperty) tests/FSharp.Core.UnitTests/FSharp.Core.UnitTests.fsproj /p:VSTestNoBuild=true /p:VSTestLogger="trx;LogFileName=$(CURDIR)/tests/TestResults/FSharp.Core.UnitTests.coreclr.trx"
 	$(TestCommand) $(NF472) $(ConfigurationProperty) tests/FSharp.Build.UnitTests/FSharp.Build.UnitTests.fsproj /p:VSTestNoBuild=true /p:VSTestLogger="trx;LogFileName=$(CURDIR)/tests/TestResults/FSharp.Build.UnitTests.coreclr.trx"
