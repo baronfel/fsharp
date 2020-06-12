@@ -1298,6 +1298,21 @@ module Shim =
         /// Used to determine if a file will not be subject to deletion during the lifetime of a typical client process.
         abstract IsStableFileHeuristic: fileName: string -> bool
 
+    /// translation of the BCL's Windows logic for Path.IsPathRooted.
+    ///
+    /// either the first char is '/', or the first char is a drive identifier followed by ':'
+    let private isWindowsStyleRootedPath (p: string) =
+        let isAlpha (c: char) =
+            (c >= 'A' && c <= 'Z')
+            || (c >= 'a' && c <= 'z')
+        (p.Length >= 1 && p.[0] = '/')
+        || (p.Length >= 2 && isAlpha p.[0] && p.[1] = ':')
+
+    /// translation of the BCL's Unix logic for Path.IsRooted.
+    ///
+    /// if the first character is '/' then the path is rooted
+    let private isUnixStyleRootedPath (p: string) =
+        p.Length > 0 && p.[0] = '/'
 
     type DefaultFileSystem() =
         interface IFileSystem with
@@ -1318,7 +1333,9 @@ module Shim =
 
             member __.GetFullPathShim (fileName: string) = System.IO.Path.GetFullPath fileName
 
-            member __.IsPathRootedShim (path: string) = Path.IsPathRooted path
+            member __.IsPathRootedShim (path: string) =
+                isWindowsStyleRootedPath path
+                || isUnixStyleRootedPath path
 
             member __.IsInvalidPathShim(path: string) = 
                 let isInvalidPath(p: string) = 
