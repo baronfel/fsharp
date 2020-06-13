@@ -1316,7 +1316,6 @@ module Shim =
 
     type DefaultFileSystem() =
         interface IFileSystem with
-
             member __.AssemblyLoadFrom(fileName: string) = 
                 Assembly.UnsafeLoadFrom fileName
 
@@ -1331,7 +1330,8 @@ module Shim =
 
             member __.FileStreamWriteExistingShim (fileName: string) = new FileStream(fileName, FileMode.Open, FileAccess.Write, FileShare.Read, 0x1000, false) :> Stream
 
-            member __.GetFullPathShim (fileName: string) = System.IO.Path.GetFullPath fileName
+            member __.GetFullPathShim (fileName: string) =
+                fileName //System.IO.Path.GetFullPath fileName
 
             member __.IsPathRootedShim (path: string) =
                 isWindowsStyleRootedPath path
