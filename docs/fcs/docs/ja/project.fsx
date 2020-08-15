@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../../artifacts/bin/fcs/net461"
 (**
 コンパイラサービス: プロジェクトの分析
 ======================================
@@ -25,6 +23,7 @@
 open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Text
 
 // インタラクティブチェッカーのインスタンスを作成
 let checker = FSharpChecker.Create()
@@ -187,7 +186,7 @@ let allUsesOfAllSymbols = wholeProjectResults.GetAllUsesOfAllSymbols()
 
 *)
 let parseResults1, checkAnswer1 = 
-    checker.ParseAndCheckFileInProject(Inputs.fileName1, 0, Inputs.fileSource1, projectOptions) 
+    checker.ParseAndCheckFileInProject(Inputs.fileName1, 0, SourceText.ofString Inputs.fileSource1, projectOptions) 
     |> Async.RunSynchronously
 
 let checkResults1 = 
@@ -196,7 +195,7 @@ let checkResults1 =
     | _ -> failwith "想定外の終了状態です"
 
 let parseResults2, checkAnswer2 = 
-    checker.ParseAndCheckFileInProject(Inputs.fileName2, 0, Inputs.fileSource2, projectOptions)
+    checker.ParseAndCheckFileInProject(Inputs.fileName2, 0, SourceText.ofString Inputs.fileSource2, projectOptions)
     |> Async.RunSynchronously
 
 let checkResults2 = 

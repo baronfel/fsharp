@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../artifacts/bin/fcs/net461"
 (**
 Interactive Service: Embedding F# Interactive
 =============================================

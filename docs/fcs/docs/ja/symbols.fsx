@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../../artifacts/bin/fcs/net461"
 (**
 コンパイラサービス: シンボルの処理
 ==================================
@@ -22,6 +20,7 @@
 open System
 open System.IO
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Text
 
 // インタラクティブチェッカーのインスタンスを作成
 let checker = FSharpChecker.Create()
@@ -77,7 +76,7 @@ type C() =
     member x.P = 1
       """
 let parseFileResults, checkFileResults = 
-    parseAndTypeCheckSingleFile(file, input2)
+    parseAndTypeCheckSingleFile(file, SourceText.ofString input2)
 
 (**
 これでコードに対する部分的なアセンブリのシグネチャが取得できるようになります:
@@ -220,7 +219,7 @@ let parseAndCheckScript (file, input) =
 let tmpFile = Path.ChangeExtension(System.IO.Path.GetTempFileName() , "fs")
 File.WriteAllText(tmpFile, input2)
 
-let projectResults = parseAndCheckScript(tmpFile, input2)
+let projectResults = parseAndCheckScript(tmpFile, SourceText.ofString input2)
 
 
 (**

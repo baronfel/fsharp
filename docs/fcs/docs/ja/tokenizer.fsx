@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../../artifacts/bin/fcs/net461"
 (**
 コンパイラサービス：F#トークナイザを使用する
 ============================================
@@ -32,7 +30,7 @@ open FSharp.Compiler.SourceCodeServices
 ファイル名はソースコードの位置を特定する場合にのみ指定する必要があります
 (存在しないファイル名でも指定できます):
 *)
-let sourceTok = FSharpSourceTokenizer([], "C:\\test.fsx")
+let sourceTok = FSharpSourceTokenizer([], Some "C:\\test.fsx")
 (**
 `sourceTok` オブジェクトを使用することでF#ソースコードの各行を
 (繰り返し)トークン化することができます。

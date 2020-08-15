@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../artifacts/bin/fcs/net461"
 (**
 Compiler Services: Working with symbols
 ============================================
@@ -207,7 +205,7 @@ Now do it for a particular input:
 let tmpFile = Path.ChangeExtension(System.IO.Path.GetTempFileName() , "fs")
 File.WriteAllText(tmpFile, input2)
 
-let projectResults = parseAndCheckScript(tmpFile, input2)
+let projectResults = parseAndCheckScript(tmpFile, SourceText.ofString input2)
 
 
 (**

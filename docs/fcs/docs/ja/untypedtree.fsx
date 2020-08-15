@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../../artifacts/bin/fcs/net461"
 (**
 コンパイラサービス：型無し構文木の処理
 ======================================
@@ -42,6 +40,7 @@
 #r "FSharp.Compiler.Service.dll"
 open System
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Text
 (**
 
 ### 型無しパースの実行
@@ -101,7 +100,7 @@ ASTを理解するには
 
 ASTに関連する要素は以下の名前空間に含まれています:
 *)
-open FSharp.Compiler.Ast
+open FSharp.Compiler.SyntaxTree
 (**
 
 ASTを処理する場合、異なる文法的要素に対するパターンマッチを行うような
@@ -242,7 +241,7 @@ let input = """
 let file = "/home/user/Test.fsx"
 
 // サンプルF#コードに対するASTを取得
-let tree = getUntypedTree(file, input) 
+let tree = getUntypedTree(file, SourceText.ofString input) 
 (**
 このコードをF# Interactiveで実行した場合、コンソールに `tree;;` と入力すると、
 データ構造に対する文字列表現が表示されることが確認できます。

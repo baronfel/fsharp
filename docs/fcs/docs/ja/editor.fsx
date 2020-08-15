@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../../artifacts/bin/fcs/net461"
 (**
 コンパイラサービス: エディタサービス
 ====================================
@@ -29,6 +27,7 @@
 
 open System
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Text
 
 // インタラクティブチェッカーのインスタンスを作成
 let checker = FSharpChecker.Create()
@@ -55,8 +54,9 @@ printfn "%s" msg.
 // 入力値の分割とファイル名の定義
 let inputLines = input.Split('\n')
 let file = "/home/user/Test.fsx"
+let inputSourceText = SourceText.ofString input
 
-let projOptions, _errors1 = checker.GetProjectOptionsFromScript(file, input) |> Async.RunSynchronously
+let projOptions, _errors1 = checker.GetProjectOptionsFromScript(file, inputSourceText) |> Async.RunSynchronously
 
 let parsingOptions, _errors2 = checker.GetParsingOptionsFromProjectOptions(projOptions)
 
@@ -73,7 +73,7 @@ let parsingOptions, _errors2 = checker.GetParsingOptionsFromProjectOptions(projO
 *)
 // パースを実行
 let parseFileResults =
-    checker.ParseFile(file, input, parsingOptions)
+    checker.ParseFile(file, inputSourceText, parsingOptions)
     |> Async.RunSynchronously
 (**
 `TypeCheckResults` に備えられた興味深い機能の紹介に入る前に、
@@ -84,7 +84,7 @@ F#コードにエラーがあった場合も何らかの型チェックの結果
 
 // 型チェックを実行
 let checkFileAnswer = 
-    checker.CheckFileInProject(parseFileResults, file, 0, input, projOptions) 
+    checker.CheckFileInProject(parseFileResults, file, 0, inputSourceText, projOptions) 
     |> Async.RunSynchronously
 
 (**
@@ -92,7 +92,7 @@ let checkFileAnswer =
 *)
 
 let parseResults2, checkFileAnswer2 =
-    checker.ParseAndCheckFileInProject(file, 0, input, projOptions)
+    checker.ParseAndCheckFileInProject(file, 0, inputSourceText, projOptions)
     |> Async.RunSynchronously
 
 (**

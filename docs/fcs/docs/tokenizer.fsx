@@ -1,5 +1,3 @@
-(*** hide ***)
-#I "../../../artifacts/bin/fcs/net461"
 (**
 Compiler Services: Using the F# tokenizer
 =========================================
