@@ -5,7 +5,7 @@
         <language>en-US</language>
         <dependencies>
             <group targetFramework=".NETStandard2.0">
-                <dependency id="FSharp.Core" version="$FSharpCorePackageVersion$" />
+                <dependency id="FSharp.Core" version="$FSharpCoreLowerPackageVersion$" />
                 <dependency id="System.Collections.Immutable" version="$SystemCollectionsImmutablePackageVersion$" />
                 <dependency id="System.Reflection.Metadata" version="$SystemReflectionMetadataPackageVersion$" />
                 <dependency id="Microsoft.Build.Framework" version="$MicrosoftBuildFrameworkPackageVersion$" />

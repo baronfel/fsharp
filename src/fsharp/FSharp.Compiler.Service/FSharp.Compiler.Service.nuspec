@@ -5,7 +5,7 @@
         <language>en-US</language>
         <dependencies>
           <group targetFramework=".NETStandard2.0">
-            <dependency id="FSharp.Core" version="$FSharpCorePackageVersion$" exclude="Build,Analyzers" />
+            <dependency id="FSharp.Core" version="[$FSharpCoreLowerPackageVersion$,$FSharpCoreUpperPackageVersion$)" exclude="Build,Analyzers" />
             <dependency id="Microsoft.Build.Framework" version="$MicrosoftBuildFrameworkPackageVersion$" exclude="Build,Analyzers" />
             <dependency id="Microsoft.Build.Tasks.Core" version="$MicrosoftBuildTasksCorePackageVersion$" exclude="Build,Analyzers" />
             <dependency id="Microsoft.Build.Utilities.Core" version="$MicrosoftBuildUtilitiesCorePackageVersion$" exclude="Build,Analyzers" />
