@@ -254,3 +254,39 @@ let tester2: int Group = []
                         |> should equal expectedTypeFormat
                 | _ -> failwithf "Couldn't get member: %s" entityName
             )
+
+
+module UnionCaseComments =
+    [<Test>]
+    let ``Union Case fields can have comments`` () =
+        let ast = """
+type Foo =
+/// docs for Thing
+| Thing of
+  /// docs for first
+  first: string *
+  /// docs for second
+  second: bool
+"""
+                        |> getParseResults
+
+        match ast with
+        | Some(ParsedInput.ImplFile(ParsedImplFileInput(modules = [
+                    SynModuleOrNamespace.SynModuleOrNamespace(decls = [
+                        SynModuleDecl.Types ([
+                            SynTypeDefn.TypeDefn (typeRepr = SynTypeDefnRepr.Simple (simpleRepr = SynTypeDefnSimpleRepr.Union(unionCases = [
+                                SynUnionCase.UnionCase (caseType = SynUnionCaseType.UnionCaseFields [
+                                    SynField.Field(xmlDoc = firstXml)
+                                    SynField.Field(xmlDoc = secondXml)
+                                ])
+                            ])))
+                        ], _)
+                    ])
+                ]))) ->
+            let firstDocs = firstXml.ToXmlDoc(false, None).GetXmlText()
+            let secondDocs = secondXml.ToXmlDoc(false, None).GetXmlText()
+
+            Assert.AreEqual("<summary>\n docs for first\n</summary>", firstDocs) |> ignore
+            Assert.AreEqual("<summary>\n docs for second\n</summary>", secondDocs) |> ignore
+        | _ ->
+            failwith "Could not find SynExpr.Do"
