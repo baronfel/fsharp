@@ -1219,7 +1219,7 @@ type internal FsiDynamicCompiler
         (istate,declaredImpls)
 
     let ProcessTypedImpl (errorLogger: ErrorLogger, optEnv, tcState: TcState, tcConfig: TcConfig, isInteractiveItExpr, topCustomAttrs, prefixPath, isIncrementalFragment, declaredImpls, ilxGenerator: IlxAssemblyGenerator) =
-        #if DEBUG
+#if DEBUG
         // Logging/debugging
         if tcConfig.printAst then
             for input in declaredImpls do 
@@ -1245,7 +1245,13 @@ type internal FsiDynamicCompiler
         let tcState   = istate.tcState
         let ilxGenerator = istate.ilxGenerator
         let tcConfig = TcConfig.Create(tcConfigB,validate=false)
-
+#if DEBUG
+        // Logging/debugging
+        if tcConfig.printAst then
+            for input in inputs do 
+                fprintfn fsiConsoleOutput.Out "ST:" 
+                fprintfn fsiConsoleOutput.Out "%+A" input
+#endif
         // Typecheck. The lock stops the type checker running at the same time as the 
         // server intellisense implementation (which is currently incomplete and #if disabled)
         let (tcState:TcState),topCustomAttrs,declaredImpls,tcEnvAtEndOfLastInput =

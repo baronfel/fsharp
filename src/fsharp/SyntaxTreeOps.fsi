@@ -51,7 +51,7 @@ val IsControlFlowExpression: e:SynExpr -> bool
 
 val mkAnonField: ty:SynType -> SynField
 
-val mkNamedField: ident:Ident * ty:SynType * m:range -> SynField
+val mkNamedField: ident:Ident * ty:SynType * xmlDoc:XmlDoc.PreXmlDoc * m:range -> SynField
 
 val mkSynPatVar: vis:SynAccess option -> id:Ident -> SynPat
 
