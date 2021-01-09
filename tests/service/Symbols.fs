@@ -265,8 +265,8 @@ type Foo =
 | Thing of
   /// docs for first
   first: string *
-  /// docs for second
-  second: bool
+  /// docs for anon field
+  bool
 """
                         |> getParseResults
 
@@ -277,16 +277,16 @@ type Foo =
                             SynTypeDefn.TypeDefn (typeRepr = SynTypeDefnRepr.Simple (simpleRepr = SynTypeDefnSimpleRepr.Union(unionCases = [
                                 SynUnionCase.UnionCase (caseType = SynUnionCaseType.UnionCaseFields [
                                     SynField.Field(xmlDoc = firstXml)
-                                    SynField.Field(xmlDoc = secondXml)
+                                    SynField.Field(xmlDoc = anonXml)
                                 ])
                             ])))
                         ], _)
                     ])
                 ]))) ->
             let firstDocs = firstXml.ToXmlDoc(false, None).GetXmlText()
-            let secondDocs = secondXml.ToXmlDoc(false, None).GetXmlText()
+            let anonDocs = anonXml.ToXmlDoc(false, None).GetXmlText()
 
             Assert.AreEqual("<summary>\n docs for first\n</summary>", firstDocs) |> ignore
-            Assert.AreEqual("<summary>\n docs for second\n</summary>", secondDocs) |> ignore
+            Assert.AreEqual("<summary>\n docs for anon field\n</summary>", anonDocs) |> ignore
         | _ ->
             failwith "Could not find SynExpr.Do"

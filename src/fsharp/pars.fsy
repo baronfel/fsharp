@@ -2478,7 +2478,8 @@ unionCaseReprElement:
        mkNamedField($1, $3, doc, wholeRange) }
 
   | appType
-     { mkAnonField $1 }
+     { let doc = grabXmlDoc(parseState, 1)
+       mkAnonField ($1, doc) }
 
 unionCaseRepr:
   | braceFieldDeclList

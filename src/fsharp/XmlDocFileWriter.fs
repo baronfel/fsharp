@@ -120,4 +120,3 @@ module XmlDocWriter =
             fprintfn os  "</member>")
         fprintfn os "</members>" 
         fprintfn os "</doc>"   
-

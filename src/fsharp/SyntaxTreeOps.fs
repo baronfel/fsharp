@@ -100,7 +100,7 @@ let rec IsControlFlowExpression e =
     | SynExpr.Typed (e, _, _) -> IsControlFlowExpression e
     | _ -> false
 
-let mkAnonField (ty: SynType) = SynField.Field([], false, None, ty, false, PreXmlDoc.Empty, None, ty.Range)
+let mkAnonField (ty: SynType, xmlDoc) = SynField.Field([], false, None, ty, false, xmlDoc, None, ty.Range)
 
 let mkNamedField (ident, ty: SynType, xmlDoc, m) = SynField.Field([], false, Some ident, ty, false, xmlDoc, None, m)
 

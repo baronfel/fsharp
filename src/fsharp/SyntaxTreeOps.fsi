@@ -49,7 +49,7 @@ val (|SingleIdent|_|): inp:SynExpr -> Ident option
 /// This affects placement of sequence points
 val IsControlFlowExpression: e:SynExpr -> bool
 
-val mkAnonField: ty:SynType -> SynField
+val mkAnonField: ty:SynType * xmlDoc:XmlDoc.PreXmlDoc -> SynField
 
 val mkNamedField: ident:Ident * ty:SynType * xmlDoc:XmlDoc.PreXmlDoc * m:range -> SynField
 
