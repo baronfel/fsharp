@@ -14,7 +14,7 @@ open FSharp.Compiler.Lexhelp
 open FSharp.Compiler.ParseHelpers
 open FSharp.Compiler.Parser
 
-let debug = false
+let debug = true
 
 let stringOfPos (p: Position) = sprintf "(%d:%d)" p.OriginalLine p.Column
 

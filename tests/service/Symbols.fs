@@ -288,3 +288,29 @@ module SyntaxExpressions =
             assertRange 4 4 5 18 doBangRange
         | _ ->
             failwith "Could not find SynExpr.Do"
+
+module OffsidesTest =
+        [<Test>]
+        let ``function parameter application in parens has relaxed undentation`` () =
+            let parseResults = """
+let f _ b = b 
+let g _ b = b
+
+// this passes, what is the context structure of `ignore`?
+ignore (
+    "",
+    true
+)
+
+// this fails, what is the context structure of `(f >> g)` and
+// why is it different from `ignore` above?
+(f >> g) (
+    "",
+    true
+)
+"""                         |> getFullParseResults
+        
+            match parseResults.Errors with
+            | [| |] -> () // no errors, so all is well
+            | errors -> failwithf "Errors during parsing: %A" errors
+            
