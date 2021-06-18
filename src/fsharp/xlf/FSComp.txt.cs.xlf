@@ -18,8 +18,8 @@
         <note />
       </trans-unit>
       <trans-unit id="considerMarkingMemberInline">
-        <source> Consider marking this member as 'inline' to allow it to be generalized at the call site.</source>
-        <target state="new"> Consider marking this member as 'inline' to allow it to be generalized at the call site.</target>
+        <source>Consider marking this member as 'inline' to allow it to be generalized at the call site.</source>
+        <target state="new">Consider marking this member as 'inline' to allow it to be generalized at the call site.</target>
         <note />
       </trans-unit>
       <trans-unit id="containerDeprecated">
