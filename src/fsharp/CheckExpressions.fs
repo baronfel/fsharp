@@ -2133,7 +2133,8 @@ module GeneralizationHelpers =
         condensationTypars |> List.iter (fun tp ->
             ConstraintSolver.ChooseTyparSolutionAndSolve cenv.css denv tp)
         generalizedTypars
-
+    
+    type GeneralizationSuggestMode = MarkInline | NoSuggestion
     let ComputeAndGeneralizeGenericTypars (cenv,
                                            denv: DisplayEnv,
                                            m,
@@ -2145,7 +2146,8 @@ module GeneralizationHelpers =
                                            allDeclaredTypars: Typars,
                                            maxInferredTypars: Typars,
                                            tauTy,
-                                           resultFirst) =
+                                           resultFirst,
+                                           suggestMode: GeneralizationSuggestMode) =
 
         let allDeclaredTypars = NormalizeDeclaredTyparsForEquiRecursiveInference cenv.g allDeclaredTypars
         let typarsToAttemptToGeneralize =
@@ -2155,12 +2157,16 @@ module GeneralizationHelpers =
 
         let generalizedTypars, freeInEnv =
             TrimUngeneralizableTypars genConstrainedTyparFlag inlineFlag typarsToAttemptToGeneralize freeInEnv
-
+        
+        let suffix =
+            match suggestMode with 
+            | MarkInline -> FSComp.SR.considerMarkingMemberInline()
+            | NoSuggestion -> ""
         allDeclaredTypars
         |> List.iter (fun tp ->
             if Zset.memberOf freeInEnv tp then
                 let ty = mkTyparTy tp
-                error(Error(FSComp.SR.tcNotSufficientlyGenericBecauseOfScope(NicePrint.prettyStringOfTy denv ty), m)))
+                error(Error(FSComp.SR.tcNotSufficientlyGenericBecauseOfScope(NicePrint.prettyStringOfTy denv ty, suffix), m)))
 
         let generalizedTypars = CondenseTypars(cenv, denv, generalizedTypars, tauTy, m)
 
@@ -6343,7 +6349,7 @@ and TcObjectExprBinding cenv (env: TcEnv) implty tpenv (absSlotInfo, bind) =
 
         let freeInEnv = GeneralizationHelpers.ComputeUngeneralizableTypars env
 
-        let generalizedTypars = GeneralizationHelpers.ComputeAndGeneralizeGenericTypars(cenv, denv, m, freeInEnv, false, CanGeneralizeConstrainedTypars, inlineFlag, Some rhsExpr, declaredTypars, [], bindingTy, false)
+        let generalizedTypars = GeneralizationHelpers.ComputeAndGeneralizeGenericTypars(cenv, denv, m, freeInEnv, false, CanGeneralizeConstrainedTypars, inlineFlag, Some rhsExpr, declaredTypars, [], bindingTy, false, GeneralizationHelpers.GeneralizationSuggestMode.NoSuggestion)
         let declaredTypars = ChooseCanonicalDeclaredTyparsAfterInference cenv.g env.DisplayEnv declaredTypars m
 
         let generalizedTypars = PlaceTyparsInDeclarationOrder declaredTypars generalizedTypars
@@ -9763,7 +9769,7 @@ and TcLetBinding cenv isUse env containerInfo declKind tpenv (synBinds, synBinds
                    let freeInEnv = lazyFreeInEnv.Force()
                    let canConstrain = GeneralizationHelpers.CanGeneralizeConstrainedTyparsForDecl declKind
                    GeneralizationHelpers.ComputeAndGeneralizeGenericTypars
-                       (cenv, denv, m, freeInEnv, canInferTypars, canConstrain, inlineFlag, Some rhsExpr, allDeclaredTypars, maxInferredTypars, tauTy, false)
+                       (cenv, denv, m, freeInEnv, canInferTypars, canConstrain, inlineFlag, Some rhsExpr, allDeclaredTypars, maxInferredTypars, tauTy, false, GeneralizationHelpers.GeneralizationSuggestMode.MarkInline)
 
             let prelimValSchemes2 = GeneralizeVals cenv denv enclosingDeclaredTypars generalizedTypars nameToPrelimValSchemeMap
 
@@ -10723,7 +10729,7 @@ and TcLetrecComputeAndGeneralizeGenericTyparsForBinding cenv denv freeInEnv (pgr
     let maxInferredTypars = freeInTypeLeftToRight cenv.g false tau
 
     let canGeneralizeConstrained = GeneralizationHelpers.CanGeneralizeConstrainedTyparsForDecl rbinfo.DeclKind
-    let generalizedTypars = GeneralizationHelpers.ComputeAndGeneralizeGenericTypars (cenv, denv, m, freeInEnv, canInferTypars, canGeneralizeConstrained, inlineFlag, Some expr, allDeclaredTypars, maxInferredTypars, tau, isCtor)
+    let generalizedTypars = GeneralizationHelpers.ComputeAndGeneralizeGenericTypars (cenv, denv, m, freeInEnv, canInferTypars, canGeneralizeConstrained, inlineFlag, Some expr, allDeclaredTypars, maxInferredTypars, tau, isCtor, GeneralizationHelpers.GeneralizationSuggestMode.MarkInline)
     generalizedTypars
 
 /// Compute the type variables which may have member constraints that need to be canonicalized prior to generalization
@@ -10964,7 +10970,7 @@ let TcAndPublishValSpec (cenv, env, containerInfo: ContainerInfo, declKind, memF
             let generalizedTypars =
                 GeneralizationHelpers.ComputeAndGeneralizeGenericTypars(cenv, denv, id.idRange,
                     emptyFreeTypars, canInferTypars, CanGeneralizeConstrainedTypars, inlineFlag,
-                    None, allDeclaredTypars, freeInType, ty, false)
+                    None, allDeclaredTypars, freeInType, ty, false, GeneralizationHelpers.GeneralizationSuggestMode.NoSuggestion)
 
             let valscheme1 = PrelimValScheme1(id, explicitTyparInfo, ty, Some partialValReprInfo, memberInfoOpt, mutableFlag, inlineFlag, NormalVal, noArgOrRetAttribs, vis, false)
 

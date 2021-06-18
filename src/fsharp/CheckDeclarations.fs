@@ -2287,7 +2287,7 @@ module MutRecBindingChecking =
             for extraTypar in allExtraGeneralizableTypars do 
                 if Zset.memberOf freeInInitialEnv extraTypar then
                     let ty = mkTyparTy extraTypar
-                    error(Error(FSComp.SR.tcNotSufficientlyGenericBecauseOfScope(NicePrint.prettyStringOfTy denv ty), extraTypar.Range))                                
+                    error(Error(FSComp.SR.tcNotSufficientlyGenericBecauseOfScope(NicePrint.prettyStringOfTy denv ty, ""), extraTypar.Range))                                
 
         // Solve any type variables in any part of the overall type signature of the class whose
         // constraints involve generalized type variables.
@@ -3138,7 +3138,9 @@ module EstablishTypeDefinitionCores =
             m 
             AllowMultiIntfInstantiations.Yes
             thisTy
-        
+    
+    
+    
     // Make the "delayed reference" boolean value recording the safe initialization of a type in a hierarchy where there is a HasSelfReferentialConstructor
     let ComputeInstanceSafeInitInfo (cenv: cenv) env m thisTy = 
         if InstanceMembersNeedSafeInitCheck cenv m thisTy then 
@@ -4327,8 +4329,8 @@ module EstablishTypeDefinitionCores =
                 try TcTyparConstraints cenv NoNewTypars checkCxs ItemOccurence.UseInType envForTycon tpenv synTyconConstraints |> ignore
                 with e -> errorRecovery e m
                | _ -> ())
-
-
+   
+    
     let TcMutRecDefns_Phase1 mkLetInfo (cenv: cenv) envInitial parent typeNames inSig tpenv m scopem mutRecNSInfo (mutRecDefns: MutRecShapes<MutRecDefnsPhase1DataForTycon * 'MemberInfo, 'LetInfo, SynComponentInfo>) =
         // Phase1A - build Entity for type definitions, exception definitions and module definitions.
         // Also for abbreviations of any of these. Augmentations are skipped in this phase.
@@ -4476,7 +4478,6 @@ module EstablishTypeDefinitionCores =
         // Now check for cyclic structs and inheritance. It's possible these should be checked as separate conditions. 
         // REVIEW: checking for cyclic inheritance is happening too late. See note above.
         TcTyconDefnCore_CheckForCyclicStructsAndInheritance cenv tycons
-
 
         (tycons, envMutRecPrelim, withBaseValsAndSafeInitInfos)
 
