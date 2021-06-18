@@ -184,8 +184,8 @@ type FSharpEmbedResourceText() =
         (holes, sb.ToString())
 
     let Unquote (s : string) =
-        if s.StartsWith "\"" && s.EndsWith "\"" then s.Substring(1, s.Length - 2)
-        else failwith "error message string should be quoted"
+        if s.StartsWith "\"" && s.EndsWith "\"" then Ok (s.Substring(1, s.Length - 2))
+        else Error ("error message string should be quoted")
 
     let ParseLine filename lineNum (txt:string) =
         let mutable errNum = None
@@ -221,10 +221,14 @@ type FSharpEmbedResourceText() =
                     Err(filename, lineNum, sprintf "After the identifier '%s' and comma, there should be the quoted string resource" ident)
                 else
                     let str =
-                        try
-                            System.String.Format(Unquote(txt.Substring i))  // Format turns e.g '\n' into that char, but also requires that we 'escape' curlies in the original .txt file, e.g. "{{"
-                        with
-                            e -> Err(filename, lineNum, sprintf "Error calling System.String.Format (note that curly braces must be escaped, and there cannot be trailing space on the line): >>>%s<<< -- %s" (txt.Substring i) e.Message)
+                            match Unquote(txt.Substring i) with
+                            | Ok message ->
+                                try
+                                    System.String.Format(message) // Format turns e.g '\n' into that char, but also requires that we 'escape' curlies in the original .txt file, e.g. "{{"
+                                with
+                                    e -> Err(filename, lineNum, sprintf "Error calling System.String.Format (note that curly braces must be escaped, and there cannot be trailing space on the line): >>>%s<<< -- %s" (txt.Substring i) e.Message)
+                            | Error error -> 
+                                Err(filename, lineNum, error)
                     let holes, netFormatString = ComputeHoles filename lineNum str
                     (lineNum, (errNum,ident), str, holes.ToArray(), netFormatString)
 

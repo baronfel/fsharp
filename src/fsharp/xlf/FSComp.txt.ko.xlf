@@ -17,6 +17,11 @@
         <target state="translated">언어 버전 {1} 이상에서 '{0}' 기능을 사용하려면 F# 라이브러리가 필요합니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="considerMarkingMemberInline">
+        <source> Consider marking this member as 'inline' to allow it to be generalized at the call site.</source>
+        <target state="new"> Consider marking this member as 'inline' to allow it to be generalized at the call site.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="containerDeprecated">
         <source>The 'AssemblyKeyNameAttribute' has been deprecated. Use 'AssemblyKeyFileAttribute' instead.</source>
         <target state="translated">'AssemblyKeyNameAttribute'는 사용되지 않습니다. 대신 'AssemblyKeyFileAttribute'를 사용하세요.</target>

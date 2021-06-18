@@ -17,6 +17,11 @@
         <target state="translated">La característica "{0}" requiere la biblioteca de F# para la versión de lenguaje {1} o superior.</target>
         <note />
       </trans-unit>
+      <trans-unit id="considerMarkingMemberInline">
+        <source> Consider marking this member as 'inline' to allow it to be generalized at the call site.</source>
+        <target state="new"> Consider marking this member as 'inline' to allow it to be generalized at the call site.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="containerDeprecated">
         <source>The 'AssemblyKeyNameAttribute' has been deprecated. Use 'AssemblyKeyFileAttribute' instead.</source>
         <target state="translated">El elemento "AssemblyKeyNameAttribute" está en desuso. Use "AssemblyKeyFileAttribute" en su lugar.</target>

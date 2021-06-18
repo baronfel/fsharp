@@ -2160,13 +2160,19 @@ module GeneralizationHelpers =
         
         let suffix =
             match suggestMode with 
-            | MarkInline -> FSComp.SR.considerMarkingMemberInline()
-            | NoSuggestion -> ""
+            | MarkInline -> Some (FSComp.SR.considerMarkingMemberInline())
+            | NoSuggestion -> None
         allDeclaredTypars
         |> List.iter (fun tp ->
             if Zset.memberOf freeInEnv tp then
                 let ty = mkTyparTy tp
-                error(Error(FSComp.SR.tcNotSufficientlyGenericBecauseOfScope(NicePrint.prettyStringOfTy denv ty, suffix), m)))
+                let errorNumber, coreMessage = FSComp.SR.tcNotSufficientlyGenericBecauseOfScope(NicePrint.prettyStringOfTy denv ty)
+                let finalMessage =
+                    match suffix with
+                    | None -> coreMessage
+                    | Some suffix -> $"{coreMessage} {suffix}"
+                error(Error(errorNumber, finalMessage), m)
+        )
 
         let generalizedTypars = CondenseTypars(cenv, denv, generalizedTypars, tauTy, m)
 
